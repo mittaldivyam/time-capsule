@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Write Your Time Capsule</title>
+
+  
+  <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet">
+ <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+   <script>
+// 
+ function doshow(pic,prev)
+        {
+            prev.src = window.URL.createObjectURL(pic.files[0])
+        }
+// 
+      $(document).ready(function(){
+          $("#view").click(function(){
+              let obj={
+                  type:"get",
+                  url:"/view",
+                  data:{
+                      pin:$("#pin").val()
+                  }
+              }
+
+              //sending AJAX Call
+              $.ajax(obj)
+              .then(function(responseInJsonAry)  //call back Function- jab response wapis aayega Khushi Khushi
+              {
+                  //alert(JSON.stringify(responseInJsonAry));
+    
+              
+               $("#text").val(responseInJsonAry[0].text);
+               $("#inputphone").val(responseInJsonAry[0].contact);
+                 let rawDate = responseInJsonAry[0].dob;
+                 let formattedDate = new Date(rawDate).toISOString().slice(0, 16);  // Get YYYY-MM-DDTHH:MM
+                $("#unlockTime").val(formattedDate);
+              
+                if (responseInJsonAry[0].ppic)
+                {
+                $("#blah").prop("src", responseInJsonAry[0].ppic);
+                }
+                else
+                {
+                 $("#blah").prop("src", "default.jpg"); // fallback image
+                }
+              
+                  
+                }).fail(function(err) //Jab error on server side :-(
+                {
+                  alert(err)
+                })
+
+          })
+      });
+  </script>
+ 
+ 
+ <style>
+    body {
+      font-family: 'Lora', serif;
+      background: url('images/time.jpg') no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .capsule-container {
+      background-color: rgba(255, 255, 255, 0.9); 
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      width: 500px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      color: #333;
+    }
+
+    textarea,
+    input[type="file"],
+    input[type="datetime-local"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-family: 'Lora', serif;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      font-family: 'Lora', serif;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="capsule-container">
+    <h2>Create Your Time Capsule</h2>
+    <form id="capsuleForm" enctype="multipart/form-data" method="POST" action="/submit-capsule">
+      <label for="image">Enter Pin</label>
+      <input type="text" maxlength="6" autofocus name="pin" id="pin">
+      
+      <label for="text">Message:</label>
+      <textarea id="text" name="text" rows="6" required></textarea>
+
+      <label for="image">Upload Image:</label>
+      <input type="file" id="pic" name="image" accept="image/*" onchange="doshow(this,blah)">
+      <center> <img src="" alt="" id="blah" width="200" height="200"></center>
+
+      <label for="unlockTime">Unlock Date & Time:</label>
+      <input type="datetime-local" id="unlockTime" name="unlockTime" required>
+  <div>
+     <button type="submit">SAVE</button>
+      <button type="button" id="view">VIEW</button>
+  </div>
+     
+    </form>
+  </div>
+
+</body>
+</html>
